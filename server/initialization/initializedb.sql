@@ -21,6 +21,7 @@ create table Song(
     AlbumID int unsigned,
     ArtistID int unsigned not null,
     dateAdded timestamp not null default current_timestamp,
+    trackNumber int unsigned,
     foreign key (AlbumID) references Album(AlbumID),
     foreign key (ArtistID) references Artist(ArtistID)
 );

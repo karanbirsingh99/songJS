@@ -9,8 +9,7 @@ module.exports = function() {
         const logger = require('../logger')
         const rl = require('readline-sync')
 
-        connectDatabase()
-        function connectDatabase(){
+        (function connectDatabase(){
             var host = rl.question("Enter database host:\n")
             var username = rl.question("Enter username:\n")
             var password = rl.question("Enter password:\n",{hideEchoBack:true})
@@ -28,8 +27,10 @@ module.exports = function() {
                         return logger.error(err)
                     }
                     config.setup=false
-                    fs.writeFile('./config.json',JSON.stringify(config),(err)=>{if(err){throw err}})
-                    console.log('Setup successful.')
+                    fs.writeFile('./config.json',JSON.stringify(config),(err)=>{
+                        if(err){throw err}
+                        console.log('Setup successful. Please re-start application')
+                        process.exit()})
 
                 })
             },
@@ -46,7 +47,7 @@ module.exports = function() {
             
             
             
-        }
+        })()
         
 
     }

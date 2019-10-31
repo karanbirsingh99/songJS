@@ -8,7 +8,7 @@ require("./initialization/setup")()
 require("./initialization/database")
 
 
-const port = 80
+const port = 8080
 const server = app.listen(port, () =>
   console.log(`server started on port ${port}`)
 )

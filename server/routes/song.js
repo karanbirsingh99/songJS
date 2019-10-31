@@ -1,13 +1,18 @@
 const express = require("express")
 const router = express.Router()
+const Song = require("./objects/Song")
 
+router.get('/:id', (req,res,next)=>{	
+		Song.getSong(req.params.id).then((result)=>{
+			if(!result) res.status(404).json({"error":"song not found"})
+			res.send(result)
 
-router.get('/:id', (req,res)=>{	
-	
-		//get song info 
+		}).catch((err)=>{
 
-	
-	
+			return next(err)
+
+		})
+
 	}
 )
 
