@@ -1,6 +1,6 @@
 const config = require('../config.json')
 const mysql = require('mysql2')
-const logger = require('../logger')
+const logger = require('../helpers/logger')
 if(config.database){
 
     const pool = mysql.createPool({
@@ -12,6 +12,6 @@ if(config.database){
       }).on('error',(err)=>{
           logger.error(err)
       })
-      module.exports = pool
+      module.exports = pool.promise()
 
 }

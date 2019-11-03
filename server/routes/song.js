@@ -1,18 +1,15 @@
 const express = require("express")
+const auth = require('../middleware/authorization')
+
 const router = express.Router()
 const Song = require("./objects/Song")
 
-router.get('/:id', (req,res,next)=>{	
-		Song.getSong(req.params.id).then((result)=>{
-			if(!result) res.status(404).json({"error":"song not found"})
+router.get('/:id',auth(false), (req,res,next)=>{	
+		Song.getSong(req.params.id)
+		.then((result)=>{
 			res.send(result)
-
-		}).catch((err)=>{
-
-			return next(err)
-
 		})
-
+		.catch(next)
 	}
 )
 
@@ -36,9 +33,14 @@ router.get('/:id/data', (req,res)=>{
 )
 
 
-router.post('/:id/played', (req,res)=>{	
+router.post('/:id/play',auth(false), (req,res,next)=>{	
 	
-		//register song as played  
+		//register song as played
+		Song.play(req.params.id)
+		.then(()=>{
+			res.send()
+		})
+		.catch(next)
 
 	
 	

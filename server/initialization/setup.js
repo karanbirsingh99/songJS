@@ -6,8 +6,9 @@ module.exports = function() {
         // load dependencies if setup is required 
         const mysql = require('mysql2/promise')
         const fs = require('fs')
-        const logger = require('../logger')
+        const logger = require('../helpers/logger')
         const rl = require('readline-sync')
+        const crypto = require('crypto');
 
         (function connectDatabase(){
             var host = rl.question("Enter database host:\n")
@@ -19,34 +20,23 @@ module.exports = function() {
                 user     : username,
                 password : password,
                 multipleStatements: true
-            }).then((connection)=>{
-                console.log("Connection successful, setting up database")
-                config.database = {host:host,user:username,password:password}
-                connection.query(fs.readFileSync('./initialization/initializedb.sql', 'utf8'), (err, results)=>{
-                    if(err){
-                        return logger.error(err)
-                    }
-                    config.setup=false
-                    fs.writeFile('./config.json',JSON.stringify(config),(err)=>{
-                        if(err){throw err}
-                        console.log('Setup successful. Please re-start application')
-                        process.exit()})
-
-                })
-            },
-                (err)=>{
-                    logger.error(err)
-                    console.log(`Error: ${err.code}, the credentials may not have worked. Let's try again`)
-                    return connectDatabase()
             })
-            
-
-
-                
-
-            
-            
-            
+            .then(connection=>{
+                config.database = {host:host,user:username,password:password}
+                return connection.query(fs.readFileSync('./initialization/initializedb.sql', 'utf8'))
+            })
+            .then(([row,fields])=>{
+                config.setup=false
+                config.jwtsecret=crypto.randomBytes(128).toString('hex')
+                fs.writeFile('./config.json',JSON.stringify(config),(err)=>{
+                    if(err){throw err}
+                    console.log('Setup successful. Please re-start application')
+                    process.exit()})
+            }).catch(err=>{
+                logger.error(err.toString())
+                console.log(`Error: ${err.code}, the credentials may not have worked. Let's try again`)
+                return connectDatabase()
+            })
         })()
         
 
