@@ -10,11 +10,20 @@ module.exports = {
                     return reject(boom.notFound("Song not found"))
                 }
                 resolve(rows[0])})
-            .catch(err=>{reject(boom.boomify(err,{statusCode:500}))})
+            .catch(reject)
         })
     },
     deleteSong(id){
-
+        return new Promise((resolve,reject)=>{
+            pool.query("delete from song where songid=?",[id])
+            .then(([result,fields])=>{
+                if(result.affectedRows==0){
+                    return reject(boom.notFound(`Song with id '${id}' was not found`))
+                }
+                resolve()
+            })
+            .catch(reject)
+        })
     },
     play(id){
         return new Promise((resolve,reject)=>{
@@ -25,8 +34,8 @@ module.exports = {
                 }
                 resolve()
             })
-            .catch(err=>{reject(boom.boomify(err,{statusCode:500}))})
+            .catch(reject)
 
-        })
+        })    
     }
 }

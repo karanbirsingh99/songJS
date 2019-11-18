@@ -5,11 +5,10 @@ module.exports = function errorHandler (err, req, res, next) {
       return next(err)
     }
     if(!err.isBoom){
-      logger.error(err.toString())
+      //don't log client syntax errors
+      if(err.statusCode!=400){
+          logger.error(err.toString())}
       err = boom.boomify(err,{statusCode : (err.statusCode ? err.statusCode : 500)})
-    }
-    else if(err.output.statusCode==500){
-      logger.error(err)
     }
     res.status(err.output.statusCode)
     res.json(err.output.payload)

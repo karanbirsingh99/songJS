@@ -38,7 +38,7 @@ router.post('/:id/play',auth(false), (req,res,next)=>{
 		//register song as played
 		Song.play(req.params.id)
 		.then(()=>{
-			res.send()
+			res.json(req.params.id)
 		})
 		.catch(next)
 
@@ -48,9 +48,15 @@ router.post('/:id/play',auth(false), (req,res,next)=>{
 )
 
 
-router.delete('/:id', (req,res)=>{	
+router.delete('/:id',auth(true), (req,res,next)=>{	
 	
 		//delete a song  
+		Song.deleteSong(req.params.id)
+		.then(()=>{
+			res.json(req.params.id)
+		})
+		.catch(next)
+
 
 	
 	

@@ -29,6 +29,7 @@ create table User(
     UserID int unsigned primary key auto_increment,
     Username varchar(255) unique not null,
     Email varchar(255) unique not null,
+    isAdmin boolean not null default 0,
     firstName varchar(255) not null,
     lastName varchar(255),
     joinDate timestamp not null default current_timestamp,
@@ -49,7 +50,7 @@ create table Playlist_Song(
     PlaylistID int unsigned,
     SongID int unsigned,
     Plays int unsigned not null default 0,
-    Song_order int unsigned,
+    Song_order int unsigned not null,
     primary key(PlaylistID,SongID),
     unique key(PlaylistID,Song_Order),
     foreign key(PlaylistID) references Playlist(PlaylistID) on delete cascade,
@@ -80,5 +81,12 @@ create trigger mustHaveChildren after delete on song for each row
             not exists(select * from (select * from artist where artistid=old.artistid) as t join song using (artistid))
             and
             artistid=old.artistid;
-    end
+    end;
 
+create trigger CannotDeleteOwner before delete on user for each row 
+    begin
+        if old.userid=1 then 
+            signal sqlstate '10293'
+            set message_text='Cannot delete default administrator';
+        end if;
+    end;

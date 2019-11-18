@@ -11,11 +11,11 @@ module.exports = function() {
         const crypto = require('crypto');
 
         (function connectDatabase(){
-            var host = rl.question("Enter database host:\n")
-            var username = rl.question("Enter username:\n")
-            var password = rl.question("Enter password:\n",{hideEchoBack:true})
+            const host = rl.question("Enter database host:\n")
+            const username = rl.question("Enter username:\n")
+            const password = rl.question("Enter password:\n",{hideEchoBack:true})
 
-            var connection = mysql.createConnection({
+            const connection = mysql.createConnection({
                 host     : host,
                 user     : username,
                 password : password,
@@ -23,23 +23,26 @@ module.exports = function() {
             })
             .then(connection=>{
                 config.database = {host:host,user:username,password:password}
-                return connection.query(fs.readFileSync('./initialization/initializedb.sql', 'utf8'))
+                if(connection){
+                    return connection.query(fs.readFileSync('./initialization/initializedb.sql', 'utf8'))
+                }
             })
             .then(([row,fields])=>{
+                
                 config.setup=false
                 config.jwtsecret=crypto.randomBytes(128).toString('hex')
                 fs.writeFile('./config.json',JSON.stringify(config),(err)=>{
                     if(err){throw err}
                     console.log('Setup successful. Please re-start application')
                     process.exit()})
+                    
             }).catch(err=>{
                 logger.error(err.toString())
                 console.log(`Error: ${err.code}, the credentials may not have worked. Let's try again`)
-                return connectDatabase()
+                connectDatabase()
             })
         })()
         
-
     }
 
 }
